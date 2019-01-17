@@ -1,0 +1,18 @@
+<aura:component controller="expenseController">
+    <ltng:require scripts="{!$Resource.jquery331}" />
+    <!-- <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> -->
+        <lightning:button name="getExpenses" label="get Expenses" onclick="{!c.doInit}" />
+    	<br /><br />
+        <aura:attribute name="expense" type="Expense__c[]"/>
+        <aura:iteration items="{!v.expense}" var="exp">
+            <input name="{!'name_'+exp.Id}" value="{!exp.Name}" id="{!'id_'+exp.Id}" type="hidden" />
+            {!exp.Name}&nbsp;
+            <div onclick="{!c.makeEditable}" data-value="{!exp.Id}">
+                <lightning:button name="makeEditable" label="edit" />
+            </div>            
+            <div onclick="{!c.inlineUpdate}" data-value="{!exp.Id}">
+                <lightning:button name="inlineUpdate" label="save" />
+            </div>    
+            <br /><br />
+        </aura:iteration>
+</aura:component>
