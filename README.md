@@ -1,3 +1,3 @@
 # SFDC-Lightning
 ## prerequisite
-Expenses__c object
+Expense__c object
