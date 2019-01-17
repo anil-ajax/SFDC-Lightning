@@ -1,0 +1,17 @@
+public class expenseController {
+    @auraEnabled
+    public static List<Expense__c> getExpenseDetails() {
+        List<Expense__c> expData = [select id, Name from expense__c];
+        return expData;
+    }
+    
+    @auraEnabled
+    public static Expense__c saveExpense(string str_id, string name) {
+        Expense__c exp = new Expense__c(); 
+        exp.Id = 'a0K7F00000TF6U3';
+        exp.Name = name;
+        update exp;
+        system.debug(exp);
+        return exp;
+    }
+}
