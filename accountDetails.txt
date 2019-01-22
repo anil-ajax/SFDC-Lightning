@@ -1,0 +1,109 @@
+#cmp
+<aura:component controller="accountsController">
+    <h2 class="heading">Accounts List</h2>
+    <hr />
+    <aura:handler name="init" value="{!this}" action="{!c.loadAccounts}" />
+    
+    <aura:attribute name="accountsList1" type="account[]" />
+    
+    <aura:attribute name="acc" type="account" />
+    
+    <div class="details">
+    details {!v.acc.Name}
+    </div>
+    
+    <aura:iteration items="{!v.accountsList1}" var="acct">
+        <div class="record">
+        
+            <div onclick="{!c.navigateToRecord}" data-value="{!acct.Id}">
+                <a>{!acct.Name}</a>
+            </div>
+            
+        &nbsp;&nbsp;
+        <div class="col" onclick="{!c.delAcct}" data-value="{!acct.Id}">
+        	<lightning:button label="delete" />
+        </div>
+        
+        </div> <!-- record -->
+    </aura:iteration>
+    
+</aura:component>
+
+#JS
+({
+	loadAccounts : function(component, event, helper) {
+		var getAccounts = component.get('c.getAccounts');
+        
+        getAccounts.setCallback(this, function(response){
+            var accountsList = response.getReturnValue();
+            //console.log(accountsList);
+            component.set("v.accountsList1", accountsList);
+        })
+        
+        $A.enqueueAction(getAccounts, false);        
+	},
+    delAcct : function(component, event, helper) {
+		var tagetId = event.currentTarget;
+    	var id_str = tagetId.dataset.value;
+        
+        console.log(id_str)
+        
+        var delAccount = component.get('c.delAccount');
+        
+        delAccount.setParams({
+            "id1" : id_str 
+        });
+        
+        delAccount.setCallback(this, function(response){
+            var state = response.getState();
+            console.log(state);
+        })
+        
+        $A.enqueueAction(delAccount, false); 
+	},
+    navigateToRecord : function(component, event, helper) {
+		var tagetId = event.currentTarget;
+    	var id_str = tagetId.dataset.value;
+        console.log('id: '+id_str);
+        var showDetails1 = component.get('c.showDetails');
+        
+        //console.log(showDetails);
+        
+        showDetails1.setParams({
+            "recId" : id_str 
+        });
+        
+        showDetails1.setCallback(this, function(response){
+			var state = response.getState();
+            console.log(state);
+            
+            var acc = response.getReturnValue();
+            //console.log('acc: '+acc);
+            component.set("v.acc", acc);
+        });
+        
+        $A.enqueueAction(showDetails1, false); 
+	}
+})
+
+#apex
+public class accountsController {
+    @auraEnabled
+    public static List<account> getAccounts() {
+        return [select id, Name from account limit 40];
+    }
+    
+    @auraEnabled
+    public static account delAccount(string id1) { 
+        //system.assert(false, 'here:'+id1);
+        Account doomedAcct = [SELECT Id FROM Account WHERE id =: id1]; 
+        delete doomedAcct;
+        return doomedAcct;
+    }
+    @auraEnabled
+    public static account showDetails(string recId) { 
+        //system.assert(false, 'here:'+recId);
+        account acct = [select id, Name from account where id =: recId];
+        return acct;
+    }
+}
